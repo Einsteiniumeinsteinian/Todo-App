@@ -1,0 +1,231 @@
+<head>
+    <title>TodoApp</title>
+    <link href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="/stylesheets/mc-calendar.min.css" />
+    <link rel="stylesheet" href="/stylesheets/clocklet.css">
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css">
+</head>
+
+<body>
+    <div class=" justify-content-center container">
+        <div class="col-lg-12">
+            <div class="card-hover-shadow-2x mb-3 card">,,
+                <div class="text-center card-heading">
+                    <h1>BETTER TASK</h1>
+                    <p>Simple Todo App Using API</p>
+                </div>
+                <div class="card-footer">
+                    <div action="" class="was-validated div-inline input-group mb-3  ">
+                        <input type="text" class=" form-control shadow form-group inputs" autofocus autocomplete="on"
+                            placeholder="Add Todo Here " required>
+                        <select name="priority" class="ml-3 mr-2 btn btn-danger inputs" required>
+                            <option value="" selected disabled hidden>Select Priority level</option>
+                            <option value="high">Urgent</option>
+                            <option value="medium">Important</option>
+                            <option value="low">Never Mind!!!</option>
+                        </select>
+                        <div class="input-group-append">
+                            <!-- <button class="mr-2 btn btn-primary">Add Task</button> -->
+                            <!-- <button class=" btn btn-link btn-sm inputs">Add Task</button> -->
+                        </div>
+                        <div class="ml-2 invalid-feedback">Please fill out this field and set priority level</div>
+                    </div>
+                    <span class="btn">Optional:</span>
+                    <input id="time-input" class="btn inputs" data-clocklet maxlength="5" placeholder="Time" readonly
+                        style="max-width: 100px;" />
+                    <input id="datepicker" class="btn inputs" type="text" placeholder="Date" readonly
+                        style="max-width: 150px;" />
+                        <button id="clear-time-input" class="btn btn-link btn-sm" onclick="clearTime()">Clear Time</button>
+                    <button class="float-right btn btn-link btn-sm input-btns" data-toggle="modal">Add Task</button>
+                    <button class="float-right btn btn-link btn-sm input-btns">Cancel</button>
+
+                </div>
+                <!-- <div class="d-block text-right card-footer"><button
+                        class="mr-2 btn btn-link btn-sm">Cancel</button><button class="btn btn-primary">Add
+                        Task</button>
+                </div> -->
+                <div class="card-header-tab card-header">
+                    <div id="task-list-btn"
+                        class="taskbar-btns card-header-title font-size-lg text-capitalize font-weight-normal taskbar-button-cursor">
+                        <i class="fa fa-tasks text-info"></i>&nbsp;
+                        Task Lists
+                    </div>
+                    <div id="urgent-btn"
+                        class=" taskbar-btns ml-4 card-header-title font-size-lg text-capitalize font-weight-normal taskbar-button-cursor">
+                        <i class="fas fa-exclamation text-danger"></i>&nbsp;
+                        Urgent
+                    </div>
+                    <div id="important-btn"
+                        class=" taskbar-btns ml-4 card-header-title font-size-lg text-capitalize font-weight-normal taskbar-button-cursor">
+                        <i class="fas fa-layer-group text-warning"></i>&nbsp;
+                        Important
+                    </div>
+                    <div id="low-priority-btn"
+                        class=" taskbar-btns ml-4 card-header-title font-size-lg text-capitalize font-weight-normal taskbar-button-cursor">
+                        <i class="fas fa-bullseye"></i>&nbsp;
+                        Low Priority
+                    </div>
+                    <div id="completed-btn"
+                        class=" taskbar-btns ml-4 card-header-title font-size-lg text-capitalize font-weight-normal taskbar-button-cursor">
+                        <i class="fa fa-check text-success"></i>&nbsp;
+                        Completed
+                    </div>
+                </div>
+                <!-- <div class="scroll-area-md">
+                                            <perfect-scrollbar class="ps-show-limits"> -->
+                <div style="position: static;" class="ps ps--active-y">
+                    <div class="ps-content">
+                        <ul id="todo-ul" class=" list-group list-group-flush">
+                            <li id="lis" class="list-group-item">
+                                <div class="todo-indicator bg-warning"></div>
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left mr-2">
+                                            <div class="custom-checkbox custom-control">
+                                                <label class="form-check-label">&nbsp;
+                                                    <input class="form-check-input" type="checkbox">
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="widget-content-left">
+                                            <div id="test" class="widget-heading">Call Sam For payments <div
+                                                    class="badge badge-danger ml-2">Rejected</div>
+                                            </div>
+                                            <div class="widget-subheading"><i>By Bob</i></div>
+                                        </div>
+                                        <div class="widget-content-right"> <button
+                                                class="border-0 btn-transition btn btn-outline-success"> <i
+                                                    class="fa fa-check"></i></button>
+                                            <button class="border-0 btn-transition btn btn-outline-danger">
+                                                <i class="fa fa-trash"></i> </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="todo-indicator bg-focus"></div>
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left mr-2">
+                                            <div class="custom-checkbox custom-control"><input
+                                                    class="custom-control-input" id="exampleCustomCheckbox1"
+                                                    type="checkbox"><label class="custom-control-label"
+                                                    for="exampleCustomCheckbox1">&nbsp;</label>
+                                            </div>
+                                        </div>
+                                        <div class="widget-content-left">
+                                            <div class="widget-heading">Make payment to Bluedart</div>
+                                            <div class="widget-subheading">
+                                                <div>By Johnny <div class="badge badge-pill badge-info ml-2">NEW
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="widget-content-right"> <button
+                                                class="border-0 btn-transition btn btn-outline-success"> <i
+                                                    class="fa fa-check" disabled></i></button> <button
+                                                class="border-0 btn-transition btn btn-outline-danger"> <i
+                                                    class="fa fa-trash" disabled></i> </button> </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="todo-indicator bg-primary"></div>
+                                <div class="widget-content p-0">
+                                    <div class="widget-content-wrapper">
+                                        <div class="widget-content-left mr-2">
+                                            <div class="custom-checkbox custom-control"><input
+                                                    class="custom-control-input" id="exampleCustomCheckbox4"
+                                                    type="checkbox"><label class="custom-control-label"
+                                                    for="exampleCustomCheckbox4">&nbsp;</label>
+                                            </div>
+                                        </div>
+                                        <div class="widget-content-left flex2">
+                                            <div class="widget-heading">Office rent </div>
+                                            <div id="timerDiv" class="widget-subheading">By Samino!</div>
+                                        </div>
+                                        <div class="widget-content-right"> <button
+                                                class="border-0 btn-transition btn btn-outline-success"> <i
+                                                    class="fa fa-pencil"></i></button> <button
+                                                class="border-0 btn-transition btn btn-outline-danger"> <i
+                                                    class="fa fa-trash"></i> </button> </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- </perfect-scrollbar> -->
+                <!-- </div> -->
+            </div>
+        </div>
+    </div>
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Open modal
+    </button> -->
+    <!-- Info Modal -->
+    <div class="modal fade" id="infoModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 id="info-modal-title" class="modal-title">Wrong Input</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body" id="info-modal-description">
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer" id="modal-footer">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal Warning -->
+    <div class="modal fade" id="deleteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete Task ?</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div id="delete-modal-body" class="modal-body">
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button id="delete-option-yes" type="button" class="btn btn-danger"
+                        data-dismiss="modal">Yes</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://kit.fontawesome.com/913e347e6f.js" crossorigin="anonymous"></script>
+    <script src="/scripts/mc-calendar.min.js"></script>
+    <script src="/scripts/clocklet.js"></script>
+    <script src="/scripts/dateInitialize.js"></script>
+    <script src="/scripts/index.js"></script>
+    <!-- <script src="/scripts/post.js"></script> -->
+</body>
