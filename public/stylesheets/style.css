@@ -230,3 +230,6 @@ outline: none;
   }
 }
 
+.hideLi {
+    display: none;
+}

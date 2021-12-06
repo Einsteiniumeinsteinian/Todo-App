@@ -4,6 +4,7 @@ const [taskInput, priorityInput, timeInput, dateInput] =
   document.getElementsByClassName('inputs')
 const [addTaskBtn, cancelBtn] = document.querySelectorAll('.input-btns')
 const todoUL = document.getElementById('todo-ul')
+const clearTimeInputBtn = document.getElementById('clear-time-input')
 const _idTempStorage = {
   _id: undefined,
   isinputPost: function () { return this._id === undefined }
@@ -18,6 +19,7 @@ window.addEventListener('load', function () {
   completedBtn.addEventListener('click', completedBtnEventListener)
   addTaskBtn.addEventListener('click', addTaskBtnEventListener)
   cancelBtn.addEventListener('click', cancelBtnEventListener)
+  clearTimeInputBtn.addEventListener('click', clearTimeInputEventListener)
 })
 
 function cancelBtnEventListener () {
@@ -27,85 +29,46 @@ function cancelBtnEventListener () {
   timeInput.value = ''
   _idTempStorage._id = undefined
 }
+
 function taskbarBtnEventListener () {
-  const allTodos = retrieveDataFromSessionStorage('allTodos')
-  pipe([
-    addContentsTodoUl,
-    addEventListenerToCreatedElements
-  ])(allTodos, 'Display all task factory')
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  removeHiddenClass(todos)
 }
 
 function urgentBtnEventListener () {
-  if (window.sessionStorage.urgentTodos) {
-    const urgentTodos = retrieveDataFromSessionStorage('urgentTodos')
-    pipe([
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(urgentTodos, 'Get urgent todos from saved sessionStorage factory')
-  } else {
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      filterData('priority', 'high'),
-      storeToSessionStorage('urgentTodos'),
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(todos, 'Get only urgent todos Factory')
-  }
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    removeHiddenClass,
+    getUnsedLisIndex('priority', 'high'),
+    hideUnusedLis
+  ])(todos, 'Get only urgent todos Factory')
 }
 
 function importantBtnEventListener () {
-  if (window.sessionStorage.importantTodos) {
-    const importantTodos = retrieveDataFromSessionStorage('importantTodos')
-    pipe([
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(importantTodos, 'Get important todos from saved sessionStorage factory')
-  } else {
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      filterData('priority', 'medium'),
-      storeToSessionStorage('importantTodos'),
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(todos, 'Get only important todos Factory')
-  }
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    removeHiddenClass,
+    getUnsedLisIndex('priority', 'medium'),
+    hideUnusedLis
+  ])(todos, 'Get only important todos Factory')
 }
 
 function lowPriorityBtnEventListener () {
-  if (window.sessionStorage.lowPriorityTodos) {
-    const lowPriorityTodos = retrieveDataFromSessionStorage('lowPriorityTodos')
-    pipe([
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(lowPriorityTodos, 'Get low priority todos from saved sessionStorage factory')
-  } else {
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      filterData('priority', 'low'),
-      storeToSessionStorage('lowPriorityTodos'),
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(todos, 'Get only low priority todos Factory')
-  }
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    removeHiddenClass,
+    getUnsedLisIndex('priority', 'low'),
+    hideUnusedLis
+  ])(todos, 'Get only low priority todos Factory')
 }
 
 function completedBtnEventListener () {
-  if (window.sessionStorage.completedTodos) {
-    const completedTodos = retrieveDataFromSessionStorage('completedTodos')
-    pipe([
-      addContentsTodoUl,
-      addEventListenerToCreatedElements
-    ])(completedTodos, 'Get completed todos from saved sessionStorage factory')
-  } else {
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      filterData('completed', true),
-      storeToSessionStorage('completedTodos'),
-      addContentsTodoUl,
-      addEventListenerToCreatedElements,
-      addEventListenerToCreatedElements
-    ])(todos, 'Get only completed todos Factory')
-  }
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    removeHiddenClass,
+    getUnsedLisIndex('completed', true),
+    hideUnusedLis
+  ])(todos, 'Get only completed todos Factory')
 }
 
 function addTaskBtnEventListener () {
@@ -217,19 +180,31 @@ function pushDataIntoTodoArray (object) {
   copiedArrayList.unshift(object.post)
   return copiedArrayList
 }
-// function clearSessionStorage (todos) {
-//   window.sessionStorage.clear()
-//   return todos
-// }
 
-function filterData (key, filterValue) {
-  return (array) => {
-    const filteredData = array.filter((data) => data[key] === filterValue)
+function removeHiddenClass (todos) {
+  const lisDom = document.getElementsByClassName('lis')
+  const lis = Array.from(lisDom)
+  lis.forEach(li => {
+    li.classList.remove('hideLi')
+  })
+  return todos
+}
+
+function getUnsedLisIndex (key, filterValue) {
+  return (todos) => {
+    const filteredData = todos.map((element, index) => index).filter((index) => todos[index][key] !== filterValue)
     return filteredData
   }
 }
 
-function pipe (fnsArray, name) {
+function hideUnusedLis (liIndexArray) {
+  liIndexArray.forEach(liindex => {
+    const lis = document.getElementsByClassName('lis')[liindex]
+    lis.classList.add('hideLi')
+  })
+}
+
+function pipe (fnsArray) {
   const copiedArray = fnsArray.slice()
   return (data) => {
     const result = copiedArray.reduce((accumulator, currentValue) => {
@@ -258,7 +233,7 @@ function addContentsTodoUl (dataArray) {
   todoUL.innerHTML = ''
   dataArray.forEach((todo, index) => {
     todoUL.appendChild(createNodeLi(todo))
-    addDateCountDownTimer(todo, index)
+    setDateCountDownTimer(todo, index)
     addEventListenerToCreatedElements(todo, index)
   })
   return dataArray
@@ -268,7 +243,7 @@ function addLiToTodoUL (post) {
   return (todos) => {
     const newLi = createNodeLi(post)
     todoUL.prepend(newLi)
-    addDateCountDownTimer(post)
+    setDateCountDownTimer(post)
     addEventListenerToCreatedElements(post, 0)
     return { post, todos }
   }
@@ -390,7 +365,7 @@ function addEventListenerToCreatedElements (todo, index) {
   return todo
 }
 
-async function checkboxEventListener (checkbox, todo) {
+function checkboxEventListener (checkbox, todo) {
   const { _id } = todo
   const requestData = {
     type: 'PATCH',
@@ -399,43 +374,59 @@ async function checkboxEventListener (checkbox, todo) {
   }
 
   if (checkbox.checked) {
-    requestData.data = { completed: true }
-    const response = await httpRequest(requestData)
-    const update = await response.json()
-    const classData = {
-      class: 'add',
-      disableButtons: true
-    }
-    console.log(update)
-    if (document.getElementById('timer-span' + _id) !== null) {
-      console.log('timer at checkbox stopped')
-      removeDateCountDownTimer(_id)
-    }
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      getTodoFromArray(_id),
-      updateFoundTodo(update),
-      classAction(classData)
-    ])(todos, 'checked checkbox todo factory')
+    chckboxChckedFn(requestData)
   } else {
-    const classData = {
-      class: 'remove',
-      disableButtons: false
-    }
-    requestData.data = { completed: false }
-    const response = await httpRequest(requestData)
-    const update = await response.json()
-    console.log(update)
-    console.log('timer at checkbox started')
-    addDateCountDownTimer(todo)
-    const todos = retrieveDataFromSessionStorage('allTodos')
-    pipe([
-      getTodoFromArray(_id),
-      updateFoundTodo(update),
-      classAction(classData),
-      storeToSessionStorage
-    ])(todos, 'checked uncheckbox todo factory')
+    chckboxUnchckdFn(requestData)
   }
+}
+
+async function chckboxChckedFn (requestData) {
+  requestData.data = { completed: true }
+  const response = await httpRequest(requestData)
+  const update = await response.json()
+
+  const { _id } = update
+  const classData = {
+    class: 'add',
+    disableButtons: true
+  }
+  const timeSpan = document.getElementById('timer-span' + _id)
+
+  if (timeSpan !== null) {
+    console.log('timer at checkbox stopped')
+    removeDateCountDownTimer(_id)
+    timeSpan.textContent = 'Done'
+  }
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    getTodoFromArray(_id),
+    updateFoundTodo(update),
+    classAction(classData),
+    storeToSessionStorage('allTodos')
+  ])(todos, 'checked checkbox todo factory')
+}
+
+async function chckboxUnchckdFn (requestData) {
+  requestData.data = { completed: false }
+  const response = await httpRequest(requestData)
+  const update = await response.json()
+
+  const { _id } = update
+  const classData = {
+    class: 'remove',
+    disableButtons: false
+  }
+
+  setDateCountDownTimer(update)
+  console.log('timer at checkbox started')
+
+  const todos = retrieveDataFromSessionStorage('allTodos')
+  pipe([
+    getTodoFromArray(_id),
+    updateFoundTodo(update),
+    classAction(classData),
+    storeToSessionStorage('allTodos')
+  ])(todos, 'checked uncheckbox todo factory')
 }
 
 async function httpRequest (requestData) {
@@ -589,52 +580,54 @@ function updateLI (object) {
   const updatedLi = createNodeLi(todo)
   currentLi.replaceWith(updatedLi)
   console.log('timer started at update')
-  addDateCountDownTimer(todo)
+  setDateCountDownTimer(todo)
   addEventListenerToCreatedElements(todo, index)
   return todos
 }
 
-function addDateCountDownTimer (todo) {
-  const { name, time, date, _id } = todo
-  if (date === '') {
-    return ''
-  } else {
-    // run on update only
-    console.log('timer start date couner')
-    let alerted = 'no'
-    let timerIDAddedToDataSet = false
-    const dueDate = new Date(`${date} ${time}`).getTime()
-    document.getElementById('timer-span' + _id).classList.add('text-success')
-    const timer = setInterval(function () {
-      const timeSpan = document.getElementById('timer-span' + _id)
-      const todaysDate = new Date().getTime()
-      const timeLeft = dueDate - todaysDate
-      if (!timerIDAddedToDataSet) {
-        timerIDAddedToDataSet = addTimerIdToDataSet({ timeSpan, timer })
-      }
-      if (timeLeft > 0) {
-        timeSpan.textContent = countDown(timeLeft)
-        if (timeLeft < 300000 && timeLeft > 120000) {
-          switch (alerted) {
-            case 'no':
-              timeSpan.classList.add('blinking')
-              alertUser(timeSpan, name)
-              alerted = 'alerted'
-              break
-          }
-        } else if (timeLeft < 120000) {
-          alerted = alertType2([timeSpan, name, alerted])
-        }
-      } else {
-        timeSpan.textContent = stopTimer(timer, timeSpan)
-      }
-    }, 1000)
+function setDateCountDownTimer (todo) {
+  const { date, _id, completed } = todo
+  if (!date) return ''
+  const timeSpan = document.getElementById('timer-span' + _id)
+  timeSpan.classList.add('text-success')
+  if (completed) {
+    console.log('done', completed)
+    timeSpan.textContent = 'Done'
+    return todo
   }
+  console.log('timer start date couner')
+  const timer = dateCountDownTimer(todo)
+  addTimerIdToDataSet({ timeSpan, timer })
 }
 
-// function setInervalFn () {
-
-// }
+function dateCountDownTimer (todo) {
+  const { date, name, time, _id } = todo
+  const dueDate = new Date(`${date} ${time}`).getTime()
+  let alerted = 'no'
+  //
+  const timer = setInterval(function () {
+    const timeSpan = document.getElementById('timer-span' + _id)
+    const todaysDate = new Date().getTime()
+    const timeLeft = dueDate - todaysDate
+    //
+    if (timeLeft > 0) {
+      timeSpan.textContent = countDown(timeLeft)
+      if (timeLeft < 300000 && timeLeft > 120000) {
+        switch (alerted) {
+          case 'no':
+            alertUser(timeSpan, name)
+            alerted = 'alerted'
+            break
+        }
+      } else if (timeLeft < 120000) {
+        alerted = alertType2([timeSpan, name, alerted])
+      }
+    } else {
+      timeSpan.textContent = stopTimer(timer, timeSpan)
+    }
+  }, 1000)
+  return timer
+}
 
 function addTimerIdToDataSet (object, timerIDAddedToDataSet) {
   const { timeSpan, timer } = object
@@ -653,15 +646,12 @@ function alertType2 (variables) {
       timeSpan.classList.add('blinking')
       return 'alerted blinking'
   }
-  return 'no'
 }
 
 // case 2 {case2: }
 
 function stopTimer (timer, timeSpan) {
-//   const timerSpan = document.getElementById('timer-span')
   console.log('timer at date function stopped')
-
   timeSpan.classList.remove('blinking')
   timeSpan.classList.add('text-danger')
   clearInterval(timer)
@@ -692,14 +682,14 @@ function alertUser (timeSpan, name) {
   timeSpan.click()
 }
 
-function clearTime () {
+function clearTimeInputEventListener () {
   document.getElementById('time-input').value = ''
 }
 
 // // function pipe (fn1, fn2) { return data => fn2(fn1(data)) }
 // const pipe = (fn1, fn2) => data => fn2(fn1(data))
 // const arr = [1, 2, 3, 2, 3, 1]
-// function filterData (dataValue, dataKey) {
+// function getUnsedLisIndex (dataValue, dataKey) {
 //   return (array) => {
 //     const filteredData = array.filter(data => {
 //       if (data === dataValue, dataKey) {
@@ -712,4 +702,4 @@ function clearTime () {
 //   }
 // }
 
-// filterData(1)(arr)
+// getUnsedLisIndex(1)(arr)
